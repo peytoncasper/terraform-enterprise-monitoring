@@ -1,0 +1,11 @@
+- Host CPU
+- Host Memory
+- Host Disk
+- Containers CPU
+- Containers RAM
+- Errors over time
+- Number of Active Workers
+- Terraform Healthcheck
+- SQL Healthcheck
+- Blob Storage Healthcheck
+- Vault Healthcheck (Optional)
