@@ -3,9 +3,9 @@ This repo contains a simple deployment of Terraform Enterprise for Azure (In Pro
 
 # Deployment Instructions
 
-## [Azure (In Progress)](https://github.com/peytoncasper/terraform-enterprise-monitoring/azure)
+## [Azure (In Progress)](https://github.com/peytoncasper/terraform-enterprise-monitoring//tree/master/azure)
 
-## [GCP (In Progress)](https://github.com/peytoncasper/terraform-enterprise-monitoring/gcp)
+## [GCP (In Progress)](https://github.com/peytoncasper/terraform-enterprise-monitoring//tree/master/gcp)
 
 ## AWS
 
