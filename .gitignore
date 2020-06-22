@@ -3,3 +3,5 @@ gcp/credentials/*
 */*.terraform
 */*.tfstate
 */*.tfstate.backup
+credentials/
+.DS_Store
