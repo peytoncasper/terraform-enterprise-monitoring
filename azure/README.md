@@ -1,5 +1,18 @@
 ![Image of Azure Montior Tracking the Metrics Below](../docs/azure.png)
 
+# Installation
+
+
+# Log Collection
+
+## Docker Version of the OMS Agent
+
+Terraform Enterprise runs entirely on docker containers and as a result, the easiest OMS Agent to utilize is the Docker variant as it is able to tap directly into the Docker logs rather than having to watch the container log files on disk. If you're looking to replicate this in your own environment, the command below details how to start the OMS agent container. There are two parameters required for the OMS agent to function and that is the Log Analytics Workspace ID and Workspace Key which can be pulled from the Azure UI or CLI.
+
+```
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/log:/var/log -v /var/lib/docker/containers:/var/lib/docker/containers -e WSID="${WORKSPACE_ID}" -e KEY="${WORKSPACE_KEY}" -p 127.0.0.1:25225:25225 -p 127.0.0.1:25224:25224/udp --name="omsagent" -h=`hostname` --restart=always microsoft/oms
+```
+
 # Metrics
 
 - Host CPU
