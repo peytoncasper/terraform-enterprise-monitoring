@@ -73,7 +73,7 @@ ContainerServiceLog
 
 - Terraform Healthcheck
 
-[Healtcheck Endpoint](https://www.terraform.io/docs/enterprise/admin/monitoring.html#health-check)
+[Healthcheck Endpoint](https://www.terraform.io/docs/enterprise/admin/monitoring.html#health-check)
 
 - SQL Healthcheck
 
