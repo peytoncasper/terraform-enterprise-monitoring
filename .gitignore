@@ -5,3 +5,4 @@ gcp/credentials/*
 */*.tfstate.backup
 credentials/
 .DS_Store
+*.tfstate

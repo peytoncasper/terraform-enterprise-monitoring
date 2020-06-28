@@ -1,38 +1,67 @@
 ![Image of Azure Montior Tracking the Metrics Below](../docs/azure.png)
 
+
+
 # Installation
+1. Create a .tfvars file 
+
+```
+touch terraform.tfvars
+```
+
+2. Add license variable
+
+```
+license="license_key"
+```
+
+3. Apply Terraform
+
+```
+terraform init
+terraform apply
+```
+
+# Metrics
+
+After this point, I'm going to assume that you either have TFE installed already or are using the environment that is stood up using this automation. The next few sections cover the various log analytics queries that are used to query information reported by the OMS agent. 
 
 
-# Log Collection
+## Log Collection
 
-## Docker Version of the OMS Agent
-
-Terraform Enterprise runs entirely on docker containers and as a result, the easiest OMS Agent to utilize is the Docker variant as it is able to tap directly into the Docker logs rather than having to watch the container log files on disk. If you're looking to replicate this in your own environment, the command below details how to start the OMS agent container. There are two parameters required for the OMS agent to function and that is the Log Analytics Workspace ID and Workspace Key which can be pulled from the Azure UI or CLI.
+Terraform Enterprise runs entirely in docker containers and as a result, the easiest OMS Agent to utilize is the Docker variant as it is able to tap directly into the Docker logs rather than having to watch the container log files on disk. If you're looking to replicate this in your own environment, the command below details how to start the OMS agent container. There are two parameters required for the OMS agent to function and that is the Log Analytics Workspace ID and Workspace Key which can be pulled from the Azure UI or CLI.
 
 ```
 sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/log:/var/log -v /var/lib/docker/containers:/var/lib/docker/containers -e WSID="${WORKSPACE_ID}" -e KEY="${WORKSPACE_KEY}" -p 127.0.0.1:25225:25225 -p 127.0.0.1:25224:25224/udp --name="omsagent" -h=`hostname` --restart=always microsoft/oms
 ```
 
-# Metrics
+## Metrics
 
 - Host CPU
 - Host Memory
 - Host Disk
-- Containers CPU
+
+### Container CPU
+
+The Container CPU chart creates a time series dataset using the average of CPU percentage over a three hour period and a twenty minute interval. 
 
 ```
 Perf
 | make-series avgif(CounterValue, CounterName == "% Processor Time"), default=0 on TimeGenerated from ago(3h) to now() step 20m by InstanceName
 ```
 
-- Containers RAM
+### Container RAM
+
+The Container RAM chart almost identical to the CPU chart, except that we utilize the Memory Usage metric. If you customize this query, ensure that you set these to the same time period and interval so that the charts represent the same set of events.
 
 ```
 Perf
 | make-series avgif(CounterValue, CounterName == "Memory Usage MB"), default=0 on TimeGenerated from ago(3h) to now() step 20m by InstanceName
 ```
 
-- Errors over time
+### Errors over time
+
+As we discussed, TFE is comprised of a number of different containers and services. As a result, the following Log Analytics Queries filter for each container by name and check for the corresponding ERROR level. Once we have the corresponding log entiries, we split our dataset into a series over twenty-four hours and a twenty minute interval.
 
 ```
 ContainerLog
@@ -63,7 +92,9 @@ ContainerLog
 | make-series count(), default=0 on TimeGenerated from ago(24h) to now() step 20m by Name
 ```
 
-- Number of Active Workers
+### Number of Active Workers
+
+TFE has a few different containers that are used to process a "Run". As a result, we're utilizing the ContainerServiceLog which tracks information about every container's executed commands. TFE utilizes Docker's random name generation to create containers for each Run that is being executed. As a result, we need to filter by the image being used which happens to be the build-worker and then grouping the log entries by the corresponding CopntainerID. Finally, we check each group for a resulting "destroy" command before splitting this data up into a series over a five hour series and a 1 minute interval. 
 
 ```
 ContainerServiceLog
@@ -71,16 +102,35 @@ ContainerServiceLog
 | make-series dcountif(ContainerID, Command != "destroy"), default=0 on TimeOfCommand from ago(5h) to now() step 1m
 ```
 
-- Terraform Healthcheck
+### Terraform Healthcheck
 
-[Healthcheck Endpoint](https://www.terraform.io/docs/enterprise/admin/monitoring.html#health-check)
+[Terraform Healthcheck Endpoint](https://www.terraform.io/docs/enterprise/admin/monitoring.html#health-check)
 
-- SQL Healthcheck
+Terraform includes a basic health check endpoint that returns a 200 OK status code if TFE is healthy. As a result, we can utilize Azure's Application Insights to set up a corresponding HTTP Health Check monitor that will poll TFE's health check endpoint on a specified frequency. The link below includes information on how to configure a URL Ping Test, enter the URL below and adjust the frequency to match your requirements.
 
-Active vs. Failed Connections
+```
+https://www.terraform_hostname_here.com/_health_check
+```
 
-- Blob Storage Healthcheck
 
-Availability Chart
+[Creating am Azure URL Ping Test](https://docs.microsoft.com/en-us/azure/azure-monitor/app/monitor-web-app-availability#create-a-url-ping-test)
 
-- Vault Healthcheck (Optional)
+
+### Azure SQL Availability
+
+Azure SQL DB's don't include a specific health check or availability metric that we can track. However, we can utilize the Active vs. Failed Connections metric as a stand in. This gives us visibility into the health of the connection between TFE and out PostgreSQL DB which gives us the necessary information as to whether or not we're experiencing an outage at the DB layer.
+
+
+### Azure Blob Storage Availability
+
+Azure Blog stroage does include an availability metric which we can utilize to track the uptime of our blob storage backend. TFE utilizes Azure Blob storage to store state files which makes it a critical component of the TFE architecture.
+
+### Vault Healthcheck
+
+If you're utilizing an external Vault cluster, Vault does include an HTTP health check endpoint. In the same way that we configured our TFE URL Ping Test, we can set up the Vault health check with Application Insights as well.
+
+```
+https://www.vault_hostname_here.com:8200/v1/sys/health
+```
+
+[Vault Healthcheck Endpoint](https://www.vaultproject.io/api-docs/system/health#sample-request)
