@@ -120,13 +120,13 @@ https://www.terraform_hostname_here.com/_health_check
 
 Azure SQL DB's don't include a specific health check or availability metric that we can track. However, we can utilize the Active vs. Failed Connections metric as a stand-in. These metrics give us visibility into the health of the connection between TFE and out PostgreSQL DB, which provides us with the necessary information about whether or not we're experiencing an outage at the DB layer.
 
-[Azure PostgreSQL Set Up](../docs/azure-postgresql.png)
+![Azure PostgreSQL Set Up](../docs/azure-postgresql.png)
 
 ### Azure Blob Storage Availability
 
 Azure Blog storage does include an availability metric that we can utilize to track the uptime of our blob storage backend. TFE uses Azure Blob storage to store state files, making it a critical component of the TFE architecture.
 
-[Azure Blob Storage Set Up](../docs/azure-blob-storage.png)
+![Azure Blob Storage Set Up](../docs/azure-blob-storage.png)
 
 ### Vault Healthcheck
 
