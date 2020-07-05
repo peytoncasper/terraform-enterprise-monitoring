@@ -66,4 +66,4 @@ bash ./install.sh \
     private-address=${PRIVATE_IP_ADDRESS} \
     public-address=${PUBLIC_IP_ADDRESS}
 
-sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/log:/var/log -v /var/lib/docker/containers:/var/lib/docker/containers -e WSID="${WORKSPACE_ID}" -e KEY="${WORKSPACE_KEY}" -p 127.0.0.1:25225:25225 -p 127.0.0.1:25224:25224/udp --name="omsagent" -h=`hostname` --restart=always microsoft/oms
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/log:/var/log -v /var/lib/docker/containers:/var/lib/docker/containers -e WSID="${WORKSPACE_ID}" -e KEY="${WORKSPACE_KEY}" -p 127.0.0.1:25227:25225 -p 127.0.0.1:25226:25224/udp --name="omsagent" -h=`hostname` --restart=always microsoft/oms
