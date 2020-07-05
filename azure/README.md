@@ -1,7 +1,6 @@
 ![Image of Azure Montior Tracking the Metrics Below](../docs/azure.png)
 
 
-
 # Installation
 1. Create a .tfvars file 
 
@@ -113,7 +112,7 @@ https://www.terraform_hostname_here.com/_health_check
 ```
 
 
-[Creating am Azure URL Ping Test](https://docs.microsoft.com/en-us/azure/azure-monitor/app/monitor-web-app-availability#create-a-url-ping-test)
+[Creating an Azure URL Ping Test](https://docs.microsoft.com/en-us/azure/azure-monitor/app/monitor-web-app-availability#create-a-url-ping-test)
 
 
 ### Azure SQL Availability
