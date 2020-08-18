@@ -27,10 +27,6 @@ variable "license" {
     type = "string"
 }
 
-variable "gcs_project" {
-    type = "string"
-}
-
-variable "gcs_credentials" {
+variable "gcs_credentials_path" {
     type = "string"
 }

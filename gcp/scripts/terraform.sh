@@ -66,19 +66,25 @@ bash ./install.sh \
     private-address=${PRIVATE_IP_ADDRESS} \
     public-address=${PUBLIC_IP_ADDRESS}
 
-sudo sed -i '/#module(load="imtcp")/c\module(load="imtcp")' /etc/rsyslog.conf
-sudo sed -i '/#input(type="imtcp" port="514")/c\input(type="imtcp" port="514")' /etc/rsyslog.conf
+# sudo sed -i '/#module(load="imtcp")/c\module(load="imtcp")' /etc/rsyslog.conf
+# sudo sed -i '/#input(type="imtcp" port="514")/c\input(type="imtcp" port="514")' /etc/rsyslog.conf
 
-sudo systemctl restart rsyslog
+# sudo systemctl restart rsyslog
 
-sudo docker run --name="logspout" \
-  --volume=/var/run/docker.sock:/var/run/docker.sock \
-  gliderlabs/logspout \
-  syslog+tls://${PRIVATE_IP_ADDRESS}:514
+# sudo docker run --name="logspout" \
+#   --volume=/var/run/docker.sock:/var/run/docker.sock \
+#   gliderlabs/logspout \
+#   syslog+tls://${PRIVATE_IP_ADDRESS}:514
 
 
-curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
-sudo bash add-monitoring-agent-repo.sh
-sudo apt-get update
-sudo apt-get install stackdriver-agent
-sudo service stackdriver-agent start
+# curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+# sudo bash add-monitoring-agent-repo.sh
+# sudo apt-get update
+# sudo apt-get install -y stackdriver-agent
+# sudo service stackdriver-agent start
+
+
+# docker run --name="logspout" \
+# 	--volume=/var/run/docker.sock:/var/run/docker.sock \
+# 	gliderlabs/logspout \
+# 	syslog+tls://localhost:5140

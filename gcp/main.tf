@@ -2,6 +2,11 @@ provider "google" {
   region      = "us-east1"
 }
 
+resource "random_integer" "cloud_sql_modifier" {
+  min     = 100
+  max     = 200
+}
+
 resource "google_compute_address" "terraform_ext" {
   name = "terraform-ext-address"
 }
@@ -41,7 +46,7 @@ resource "google_storage_bucket" "terraform" {
 }
 
 resource "google_sql_database_instance" "terraform" {
-  name             = "terraform-instance"
+  name             = join("", ["terraform-instance",random_integer.cloud_sql_modifier.result])
   database_version = "POSTGRES_11"
   region           = "us-east1"
 
@@ -87,8 +92,8 @@ resource "google_compute_instance" "terraform" {
     "PRIVATE_IP_ADDRESS" = google_compute_address.terraform_int.address,
     "PUBLIC_IP_ADDRESS"  = google_compute_address.terraform_ext.address,
     "ENCRYPTION_PASSWORD"= var.encryption_password,
-    "GCS_CREDENTIALS"    = var.gcs_credentials,
-    "GCS_PROJECT"        = var.gcs_project,
+    "GCS_CREDENTIALS"    = file(var.gcs_credentials_path),
+    "GCS_PROJECT"        = google_storage_bucket.terraform.project,
     "GCS_BUCKET"         = google_storage_bucket.terraform.name,
     "PG_DB_NAME"         = google_sql_database.terraform.name,
     "PG_USERNAME"        = join("@", [var.pg_admin_username,google_sql_database_instance.terraform.connection_name]),
@@ -98,6 +103,6 @@ resource "google_compute_instance" "terraform" {
   })
   
   service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro", "monitoring-write"]
+    scopes = ["userinfo-email", "compute-ro", "storage-ro", "monitoring-write", "logging-write", "cloud-platform"]
   }
 }
