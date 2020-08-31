@@ -52,6 +52,15 @@ resource "google_sql_database_instance" "terraform" {
 
   settings {
     tier = "db-f1-micro"
+
+    ip_configuration {
+
+      authorized_networks {
+        name = "terraform-machine"
+        value = google_compute_address.terraform_ext.address
+      }
+
+    }
   }
 }
 
@@ -92,17 +101,18 @@ resource "google_compute_instance" "terraform" {
     "PRIVATE_IP_ADDRESS" = google_compute_address.terraform_int.address,
     "PUBLIC_IP_ADDRESS"  = google_compute_address.terraform_ext.address,
     "ENCRYPTION_PASSWORD"= var.encryption_password,
-    "GCS_CREDENTIALS"    = file(var.gcs_credentials_path),
+    "GCS_CREDENTIALS"    = replace(file(var.gcs_credentials_path), "\\n", ""),
     "GCS_PROJECT"        = google_storage_bucket.terraform.project,
     "GCS_BUCKET"         = google_storage_bucket.terraform.name,
     "PG_DB_NAME"         = google_sql_database.terraform.name,
-    "PG_USERNAME"        = join("@", [var.pg_admin_username,google_sql_database_instance.terraform.connection_name]),
+    "PG_USERNAME"        = var.pg_admin_username,
     "PG_PASSWORD"        = var.pg_admin_password,
-    "PG_ENDPOINT"        = google_sql_database_instance.terraform.connection_name,
+    "PG_ENDPOINT"        = google_sql_database_instance.terraform.public_ip_address,
     "LICENSE"            = var.license
   })
   
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro", "monitoring-write", "logging-write", "cloud-platform"]
   }
+  
 }
