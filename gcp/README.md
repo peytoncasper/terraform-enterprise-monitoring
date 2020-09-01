@@ -1,6 +1,8 @@
+![Configuring BindPlane Docker Source](../docs/gcp-dashboard.png)
+
 ## BindPlane Collector
 
-Following the instructions from GCP and BlueMedora on setting up the Collector and Destination components of BindPlane. The BindPlane Collector has four components.
+The BindPlane Collector has four components.
 
 1. Host Agent (Installed on the TFE Host)
 2. Collector (Separate Instance that Sends Metrics to GCP Operations)
